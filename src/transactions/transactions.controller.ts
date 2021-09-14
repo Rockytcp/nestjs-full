@@ -4,17 +4,26 @@ import {
   Post,
   Body,
   ValidationPipe,
+  UseGuards,
+  Req,
   // Patch,
   // Param,
   // Delete,
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { JwtAuthGuard } from '../auth/jwt.guard';
+import { TenantGuard } from 'src/tenant/tenant.guard';
+import { TenantService } from 'src/tenant/tenant/tenant.service';
 // import { UpdateTransactionDto } from './dto/update-transaction.dto';
 
+@UseGuards(JwtAuthGuard, TenantGuard)
 @Controller('transactions')
 export class TransactionsController {
-  constructor(private readonly transactionsService: TransactionsService) {}
+  constructor(
+    private readonly transactionsService: TransactionsService,
+    private tenantService: TenantService,
+  ) {}
 
   @Post()
   create(@Body() createTransactionDto: CreateTransactionDto) {
@@ -22,7 +31,7 @@ export class TransactionsController {
   }
 
   @Get()
-  findAll() {
+  findAll(@Req() req: any) {
     return this.transactionsService.findAll();
   }
 
