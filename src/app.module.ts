@@ -8,6 +8,8 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { AccountsModule } from './accounts/accounts.module';
 import { Account } from './accounts/entities/account.entity';
 import { CommonModule } from './common/common.module';
+import { AuthModule } from './auth/auth.module';
+import { TenantModule } from './tenant/tenant.module';
 
 @Module({
   imports: [
@@ -26,12 +28,13 @@ import { CommonModule } from './common/common.module';
       synchronize: true,
       sync: {
         alter: true,
-        force: true,
       },
     }),
     TransactionsModule,
     AccountsModule,
     CommonModule,
+    AuthModule,
+    TenantModule,
   ],
   controllers: [AppController],
   providers: [AppService],

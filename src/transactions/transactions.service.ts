@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { TenantService } from 'src/tenant/tenant/tenant.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 // import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Transaction } from './entities/transaction.entity';
@@ -8,14 +9,20 @@ import { Transaction } from './entities/transaction.entity';
 export class TransactionsService {
   constructor(
     @InjectModel(Transaction) private transactionModel: typeof Transaction,
+    private tenantService: TenantService,
   ) {}
 
   create(createTransactionDto: CreateTransactionDto) {
-    return this.transactionModel.create(createTransactionDto);
+    return this.transactionModel.create({
+      ...createTransactionDto,
+      account_id: this.tenantService.tenant.id,
+    });
   }
 
   async findAll() {
-    const transactions = await this.transactionModel.findAll();
+    const transactions = await this.transactionModel.findAll({
+      where: { account_id: this.tenantService.tenant.id },
+    });
     if (transactions.length === 0) {
       throw new NotFoundException('Transactions not found');
     }
